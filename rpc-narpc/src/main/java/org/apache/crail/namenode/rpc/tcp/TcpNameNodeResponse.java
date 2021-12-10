@@ -18,6 +18,7 @@
 
 package org.apache.crail.namenode.rpc.tcp;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.crail.rpc.RpcNameNodeState;
@@ -44,7 +45,9 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 	private RpcResponseMessage.GetDataNodeRes getDataNodeRes;
 	private RpcResponseMessage.PingNameNodeRes pingNameNodeRes;
 	private RpcResponseMessage.RemoveDataNodeRes removeDataNodeRes;
-	
+	private RpcResponseMessage.HeartbeatRes heartbeatRes;
+
+
 	public TcpNameNodeResponse() {
 		this.type = 0;
 		this.error = 0;
@@ -58,6 +61,7 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 		this.getDataNodeRes = new RpcResponseMessage.GetDataNodeRes();
 		this.pingNameNodeRes = new RpcResponseMessage.PingNameNodeRes();
 		this.removeDataNodeRes = new RpcResponseMessage.RemoveDataNodeRes();
+		this.heartbeatRes = new RpcResponseMessage.HeartbeatRes();
 	}
 	
 	public TcpNameNodeResponse(RpcResponseMessage.VoidRes message) {
@@ -109,8 +113,13 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 		this.type = message.getType();
 		this.removeDataNodeRes = message;
 	}
-	
-	public void setType(short type) throws Exception {
+
+    public TcpNameNodeResponse(RpcResponseMessage.HeartbeatRes message) {
+		this.type = message.getType();
+		this.heartbeatRes = message;
+    }
+
+    public void setType(short type) throws Exception {
 		this.type = type;
 	}	
 
@@ -154,12 +163,15 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 		case RpcProtocol.RES_REMOVE_DATANODE:
 			written += removeDataNodeRes.write(buffer);
 			break;
+			case RpcProtocol.RES_HEARTBEAT:
+			//	written += heartbeatRes.write(buffer);
+				break;
 		}
 		
 		return written;
 	}
 	
-	public void update(ByteBuffer buffer){
+	public void update(ByteBuffer buffer) throws IOException {
 		this.type = buffer.getShort();
 		this.error = buffer.getShort();
 		
@@ -203,6 +215,10 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 		case RpcProtocol.RES_REMOVE_DATANODE:
 			removeDataNodeRes.update(buffer);
 			removeDataNodeRes.setError(error);
+			break;
+		case RpcProtocol.REQ_HEARTBEAT:
+			heartbeatRes.update(buffer);
+			heartbeatRes.setError(error);
 			break;
 		}
 	}
@@ -258,4 +274,6 @@ public class TcpNameNodeResponse extends RpcResponseMessage implements RpcNameNo
 	public RpcResponseMessage.RemoveDataNodeRes removeDataNode() {
 		return this.removeDataNodeRes;
 	}
+
+	public RpcResponseMessage.HeartbeatRes heartbeat() { return this.heartbeatRes; }
 }

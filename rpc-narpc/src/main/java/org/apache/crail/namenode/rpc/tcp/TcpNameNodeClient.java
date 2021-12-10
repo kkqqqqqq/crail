@@ -61,7 +61,7 @@ public class TcpNameNodeClient implements RpcClient {
     		throw new IOException(e);
     	}
     }
-
+	//关闭所有rpc链接
 	@Override
 	public void close() {
 		try {

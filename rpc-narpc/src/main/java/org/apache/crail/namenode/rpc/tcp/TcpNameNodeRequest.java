@@ -46,6 +46,7 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 	private RpcRequestMessage.DumpNameNodeReq dumpNameNodeReq;
 	private RpcRequestMessage.PingNameNodeReq pingNameNodeReq;
 	private RpcRequestMessage.RemoveDataNodeReq removeDataNodeReq;
+	private RpcRequestMessage.HeartbeatReq heartbeatReq;
 
 	public TcpNameNodeRequest() {
 		this.cmd = 0;
@@ -62,6 +63,7 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 		this.pingNameNodeReq = new RpcRequestMessage.PingNameNodeReq();
 		this.getDataNodeReq = new RpcRequestMessage.GetDataNodeReq();
 		this.removeDataNodeReq = new RpcRequestMessage.RemoveDataNodeReq();
+		this.heartbeatReq = new RpcRequestMessage.HeartbeatReq();
 	}
 	
 	public TcpNameNodeRequest(RpcRequestMessage.CreateFileReq message) {
@@ -122,8 +124,13 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 		this.type = message.getType();
 		this.removeDataNodeReq = message;
 	}
-
-	public void setCommand(short command) {
+  ///****************************************************************
+    public TcpNameNodeRequest( RpcRequestMessage.HeartbeatReq message) {
+		this.type = message.getType();
+		this.heartbeatReq = message;
+    }
+	///****************************************************************
+    public void setCommand(short command) {
 		this.cmd = command;
 	}	
 
@@ -137,6 +144,9 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 		
 		int written = 4;
 		switch(type){
+			case RpcProtocol.REQ_HEARTBEAT:
+				written += heartbeatReq.write(buffer);
+				break;
 		case RpcProtocol.REQ_CREATE_FILE:
 			written += createFileReq.write(buffer);
 			break;		
@@ -173,6 +183,8 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 		case RpcProtocol.REQ_REMOVE_DATANODE:
 			written += removeDataNodeReq.write(buffer);
 			break;
+
+
 		}
 		
 		return written;
@@ -218,6 +230,9 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 			break;
 		case RpcProtocol.REQ_REMOVE_DATANODE:
 			removeDataNodeReq.update(buffer);
+			break;
+		case RpcProtocol.REQ_HEARTBEAT:
+			heartbeatReq.update(buffer);
 			break;
 		}
 	}
@@ -276,5 +291,9 @@ public class TcpNameNodeRequest extends RpcRequestMessage implements NaRPCMessag
 
 	public RpcRequestMessage.RemoveDataNodeReq removeDataNode() {
 		return this.removeDataNodeReq;
+	}
+
+	public RpcRequestMessage.HeartbeatReq heartbeat() {
+		return this.heartbeatReq;
 	}
 }

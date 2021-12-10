@@ -46,6 +46,7 @@ public class TcpNameNodeServer extends RpcServer {
 	public void init(CrailConfiguration conf, String[] arg1) throws Exception {
 		TcpRpcConstants.updateConstants(conf);
 		TcpRpcConstants.verify();
+		//request  response
 		this.serverGroup = new NaRPCServerGroup<TcpNameNodeRequest, TcpNameNodeResponse>(
 				dispatcher, TcpRpcConstants.NAMENODE_TCP_QUEUEDEPTH,
 				TcpRpcConstants.NAMENODE_TCP_MESSAGESIZE, true, TcpRpcConstants.NAMENODE_TCP_CORES);
@@ -62,6 +63,7 @@ public class TcpNameNodeServer extends RpcServer {
 	public void run() {
 		try {
 			while (true) {
+
 				NaRPCServerChannel endpoint = serverEndpoint.accept();
 				LOG.info("new connection from " + endpoint.address());
 			}

@@ -26,6 +26,7 @@ import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeInfo;
 import org.apache.crail.metadata.FileInfo;
 import org.apache.crail.metadata.FileName;
+import org.apache.crail.metadata.HeartbeatResult;
 import org.apache.crail.rpc.*;
 import org.apache.crail.utils.CrailUtils;
 import org.slf4j.Logger;
@@ -54,6 +55,10 @@ public class TcpRpcConnection implements RpcConnection {
 	public void close() throws IOException {
 		this.endpoint.close();
 	}
+
+	@Override
+
+
 
 	public RpcFuture<RpcCreateFile> createFile(FileName fileName,
 			CrailNodeType type, int storageAffinity, int locationAffinity, boolean enumerable)
@@ -196,4 +201,16 @@ public class TcpRpcConnection implements RpcConnection {
 		return new TcpFuture<RpcRemoveDataNode>(future, resp);
 	}
 
+
+
+	public RpcFuture<RPCHeartbeat> heartbeat(DataNodeInfo dataNodeInfo,HeartbeatResult heart) throws Exception {
+		RpcRequestMessage.HeartbeatReq req = new RpcRequestMessage.HeartbeatReq(dataNodeInfo,heart);
+		RpcResponseMessage.HeartbeatRes resp = new RpcResponseMessage.HeartbeatRes();
+
+		TcpNameNodeRequest request = new TcpNameNodeRequest(req);
+		TcpNameNodeResponse response = new TcpNameNodeResponse(resp);
+		request.setCommand(RpcProtocol.CMD_HEARTBEAT);
+		NaRPCFuture<TcpNameNodeRequest, TcpNameNodeResponse> future=endpoint.issueRequest(request, response);
+		return new TcpFuture<RPCHeartbeat>(future, resp);
+	}
 }
