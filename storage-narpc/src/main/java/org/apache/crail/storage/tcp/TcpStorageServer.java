@@ -91,7 +91,8 @@ public class TcpStorageServer implements Runnable, StorageServer, NaRPCService<T
 	}
 
 	@Override
-	public InetSocketAddress getAddress() {
+	public InetSocketAddress
+	getAddress() {
 		return address;
 	}
 
