@@ -36,10 +36,10 @@ public class CrailConstants {
 	public static long TOKEN_EXPIRATION = 10;
 
 	public static final String BLOCK_SIZE_KEY = "crail.blocksize";
-	public static long BLOCK_SIZE = 1048576;
+	public static long BLOCK_SIZE = 1048576; //1m
 
 	public static final String CACHE_LIMIT_KEY = "crail.cachelimit";
-	public static long CACHE_LIMIT = 1073741824;
+	public static long CACHE_LIMIT = 1073741824; //1G
 
 	public static final String CACHE_PATH_KEY = "crail.cachepath";
 	public static String CACHE_PATH = "/dev/hugepages/cache";

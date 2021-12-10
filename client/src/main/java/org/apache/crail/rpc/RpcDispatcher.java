@@ -27,6 +27,7 @@ import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeInfo;
 import org.apache.crail.metadata.FileInfo;
 import org.apache.crail.metadata.FileName;
+import org.apache.crail.metadata.HeartbeatResult;
 import org.apache.crail.utils.CrailUtils;
 import org.slf4j.Logger;
 
@@ -143,13 +144,18 @@ public class RpcDispatcher implements RpcConnection {
 		}
 		return connections[0].removeDataNode(ipaddr, port);
 	}
-
+	@Override
+	public RpcFuture<RPCHeartbeat> heartbeat(DataNodeInfo dnInfo,HeartbeatResult heart) throws Exception {
+		return connections[0].heartbeat(dnInfo,heart);
+	}
 	@Override
 	public void close() throws Exception {
 		for (RpcConnection connection : connections){
 			connection.close();
 		}
 	}
+
+
 
 	@Override
 	public String toString() {

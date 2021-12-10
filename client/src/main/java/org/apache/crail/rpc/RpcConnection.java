@@ -26,6 +26,8 @@ import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeInfo;
 import org.apache.crail.metadata.FileInfo;
 import org.apache.crail.metadata.FileName;
+import org.apache.crail.metadata.HeartbeatResult;
+
 
 public interface RpcConnection {
 	public abstract RpcFuture<RpcCreateFile> createFile(
@@ -63,8 +65,13 @@ public interface RpcConnection {
 
 	public abstract RpcFuture<RpcRemoveDataNode> removeDataNode(
 			InetAddress ipaddr, int port) throws Exception;
-	
+
+	public abstract RpcFuture<RPCHeartbeat> heartbeat(
+			DataNodeInfo dnInfo,HeartbeatResult heart) throws Exception;
+
 	public abstract void close() throws Exception;
+
+
 	
 	@SuppressWarnings("unchecked")
 	public static RpcConnection createInstance(String name) throws Exception {
@@ -76,6 +83,9 @@ public interface RpcConnection {
 		} else {
 			throw new Exception("Cannot instantiate RPC client of type " + name);
 		}
-	}		
+	}
+
+
+
 }
 
