@@ -46,6 +46,7 @@ public class DaRPCNameNodeRequest implements DaRPCMessage {
 	private RpcRequestMessage.DumpNameNodeReq dumpNameNodeReq;
 	private RpcRequestMessage.PingNameNodeReq pingNameNodeReq;
 	private RpcRequestMessage.RemoveDataNodeReq removeDataNodeReq;
+	private RpcRequestMessage.HeartbeatReq heartbeatReq;
 
 	public DaRPCNameNodeRequest() {
 		this.cmd = 0;
@@ -62,6 +63,7 @@ public class DaRPCNameNodeRequest implements DaRPCMessage {
 		this.pingNameNodeReq = new RpcRequestMessage.PingNameNodeReq();
 		this.getDataNodeReq = new RpcRequestMessage.GetDataNodeReq();
 		this.removeDataNodeReq = new RpcRequestMessage.RemoveDataNodeReq();
+		this.heartbeatReq = new RpcRequestMessage.HeartbeatReq();
 	}
 	
 	public DaRPCNameNodeRequest(RpcRequestMessage.CreateFileReq message) {
@@ -122,7 +124,10 @@ public class DaRPCNameNodeRequest implements DaRPCMessage {
 		this.type = message.getType();
 		this.removeDataNodeReq = message;
 	}
-	
+	public DaRPCNameNodeRequest(RpcRequestMessage.HeartbeatReq message) {
+		this.type = message.getType();
+		this.heartbeatReq = message;
+	}
 	public void setCommand(short command) {
 		this.cmd = command;
 	}	
@@ -277,4 +282,6 @@ public class DaRPCNameNodeRequest implements DaRPCMessage {
 	public RpcRequestMessage.RemoveDataNodeReq removeDataNode() {
 		return this.removeDataNodeReq;
 	}
+
+	public RpcRequestMessage.HeartbeatReq heartbeat() { return this.heartbeatReq; }
 }

@@ -27,21 +27,8 @@ import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeInfo;
 import org.apache.crail.metadata.FileInfo;
 import org.apache.crail.metadata.FileName;
-import org.apache.crail.rpc.RpcConnection;
-import org.apache.crail.rpc.RpcCreateFile;
-import org.apache.crail.rpc.RpcDeleteFile;
-import org.apache.crail.rpc.RpcFuture;
-import org.apache.crail.rpc.RpcGetBlock;
-import org.apache.crail.rpc.RpcGetDataNode;
-import org.apache.crail.rpc.RpcGetFile;
-import org.apache.crail.rpc.RpcGetLocation;
-import org.apache.crail.rpc.RpcPing;
-import org.apache.crail.rpc.RpcRemoveDataNode;
-import org.apache.crail.rpc.RpcProtocol;
-import org.apache.crail.rpc.RpcRenameFile;
-import org.apache.crail.rpc.RpcRequestMessage;
-import org.apache.crail.rpc.RpcResponseMessage;
-import org.apache.crail.rpc.RpcVoid;
+import org.apache.crail.metadata.HeartbeatResult;
+import org.apache.crail.rpc.*;
 import org.apache.crail.utils.CrailUtils;
 import org.slf4j.Logger;
 
@@ -285,6 +272,22 @@ public class DaRPCNameNodeConnection implements RpcConnection {
 		
 		DaRPCNameNodeFuture<RpcRemoveDataNode> nameNodeFuture = new DaRPCNameNodeFuture<RpcRemoveDataNode>(future, removeDataNodeRes);
 		
+		return nameNodeFuture;
+	}
+
+	@Override
+	public RpcFuture<RPCHeartbeat> heartbeat(DataNodeInfo dnInfo,HeartbeatResult heart) throws Exception {
+		RpcRequestMessage.HeartbeatReq heartbeatReq = new RpcRequestMessage.HeartbeatReq(dnInfo,heart);
+		DaRPCNameNodeRequest request = new DaRPCNameNodeRequest(heartbeatReq);
+		request.setCommand(RpcProtocol.CMD_HEARTBEAT);
+
+		RpcResponseMessage.HeartbeatRes heartbeatRes = new RpcResponseMessage.HeartbeatRes();
+		DaRPCNameNodeResponse response = new DaRPCNameNodeResponse(heartbeatRes);
+
+		DaRPCFuture<DaRPCNameNodeRequest, DaRPCNameNodeResponse> future = issueRPC(request, response);
+
+		DaRPCNameNodeFuture<RPCHeartbeat> nameNodeFuture = new DaRPCNameNodeFuture<RPCHeartbeat>(future, heartbeatRes);
+
 		return nameNodeFuture;
 	}
 	

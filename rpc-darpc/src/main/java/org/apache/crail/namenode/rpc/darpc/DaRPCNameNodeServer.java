@@ -69,6 +69,7 @@ public class DaRPCNameNodeServer extends RpcServer {
 			namenodeServerEp.bind(addr, DaRPCConstants.NAMENODE_DARPC_BACKLOG);
 			LOG.info("opened server at " + addr);
 			while (true) {
+				//接受一个rpc
 				DaRPCServerEndpoint<DaRPCNameNodeRequest, DaRPCNameNodeResponse> clientEndpoint = namenodeServerEp.accept();
 				LOG.info("accepting RPC connection, qpnum " + clientEndpoint.getQp().getQp_num());
 			}

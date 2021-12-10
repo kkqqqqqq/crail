@@ -122,6 +122,9 @@ public class DaRPCServiceDispatcher extends DaRPCNameNodeProtocol implements DaR
 			case RpcProtocol.CMD_REMOVE_DATANODE:
 				error = service.removeDataNode(request.removeDataNode(), response.removeDataNode(), response);
 				break;
+				case RpcProtocol.CMD_HEARTBEAT:
+				error = service.heartbeat(request.heartbeat(), response.heartbeat(), response);
+				break;
 			default:
 				error = RpcErrors.ERR_INVALID_RPC_CMD;
 				LOG.info("Rpc command not valid, opcode " + request.getCmd());

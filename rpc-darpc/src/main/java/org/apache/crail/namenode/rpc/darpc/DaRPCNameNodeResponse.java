@@ -41,7 +41,8 @@ public class DaRPCNameNodeResponse implements DaRPCMessage, RpcNameNodeState {
 	private RpcResponseMessage.GetDataNodeRes getDataNodeRes;
 	private RpcResponseMessage.PingNameNodeRes pingNameNodeRes;
 	private RpcResponseMessage.RemoveDataNodeRes removeDataNodeRes;
-	
+	private RpcResponseMessage.HeartbeatRes heartbeatRes;
+
 	public DaRPCNameNodeResponse() {
 		this.type = 0;
 		this.error = 0;
@@ -56,6 +57,7 @@ public class DaRPCNameNodeResponse implements DaRPCMessage, RpcNameNodeState {
 		this.getDataNodeRes = new RpcResponseMessage.GetDataNodeRes();
 		this.pingNameNodeRes = new RpcResponseMessage.PingNameNodeRes();
 		this.removeDataNodeRes = new RpcResponseMessage.RemoveDataNodeRes();
+		this.heartbeatRes = new RpcResponseMessage.HeartbeatRes();
 	}
 	
 	public DaRPCNameNodeResponse(RpcResponseMessage.VoidRes message) {
@@ -106,6 +108,10 @@ public class DaRPCNameNodeResponse implements DaRPCMessage, RpcNameNodeState {
 	public DaRPCNameNodeResponse(RpcResponseMessage.RemoveDataNodeRes message) {
 		this.type = message.getType();
 		this.removeDataNodeRes = message;
+	}
+	public DaRPCNameNodeResponse(RpcResponseMessage.HeartbeatRes message) {
+		this.type = message.getType();
+		this.heartbeatRes = message;
 	}
 	
 	public void setType(short type) throws Exception {
@@ -308,4 +314,6 @@ public class DaRPCNameNodeResponse implements DaRPCMessage, RpcNameNodeState {
 	public RpcResponseMessage.RemoveDataNodeRes removeDataNode() {
 		return this.removeDataNodeRes;
 	}
+
+	public RpcResponseMessage.HeartbeatRes heartbeat() { return this.heartbeatRes; }
 }
