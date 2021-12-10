@@ -28,6 +28,8 @@ import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeInfo;
 import org.apache.crail.metadata.FileInfo;
 import org.apache.crail.metadata.FileName;
+import org.apache.crail.metadata.HeartbeatResult;
+
 
 public class RpcRequestMessage {
 	public static class CreateFileReq implements RpcProtocol.NameNodeRpcMessage {
@@ -38,6 +40,7 @@ public class RpcRequestMessage {
 		protected int storageClass;
 		protected int locationClass;
 		protected boolean enumerable;
+		protected int tp;
 		
 		public CreateFileReq(){
 			this.filename = new FileName();
@@ -75,14 +78,21 @@ public class RpcRequestMessage {
 			return enumerable;
 		}
 
+		//public int gettp(){ return tp; }
+
 		public int size() {
 			return CSIZE;
 		}
 		
 		public short getType(){
 			return RpcProtocol.REQ_CREATE_FILE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			filename.write(buffer);
 			buffer.putInt(type.getLabel());
@@ -91,7 +101,9 @@ public class RpcRequestMessage {
 			buffer.putInt(enumerable ? 1 : 0);
 			
 			return CSIZE;
-		}		
+		}
+
+
 
 		public void update(ByteBuffer buffer) {
 			filename.update(buffer);
@@ -142,8 +154,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_GET_FILE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			filename.write(buffer);
 			buffer.putInt(writeable ? 1 : 0);
@@ -187,8 +204,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_SET_FILE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			fileInfo.write(buffer, true);
 			buffer.putInt(close ? 1 : 0);
@@ -243,8 +265,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_REMOVE_FILE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			filename.write(buffer);
 			buffer.putInt(recursive ? 1 : 0);
@@ -289,8 +316,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_RENAME_FILE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = srcFileName.write(buffer);
 			written += dstFileName.write(buffer);
@@ -354,8 +386,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_GET_BLOCK;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			buffer.putLong(fd);
 			buffer.putLong(token);
@@ -412,8 +449,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_GET_LOCATION;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			fileName.write(buffer);
 			buffer.putLong(position);
@@ -449,8 +491,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_SET_BLOCK;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer){
 			int written = blockInfo.write(buffer);
 			return written;
@@ -496,8 +543,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_GET_DATANODE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = dnInfo.write(buffer);
 			return written;
@@ -511,8 +563,7 @@ public class RpcRequestMessage {
 			}
 		}		
 	}	
-	
-	
+
 	public static class DumpNameNodeReq implements RpcProtocol.NameNodeRpcMessage {
 		public static int CSIZE = 4;
 		
@@ -532,8 +583,13 @@ public class RpcRequestMessage {
 		
 		public short getType(){
 			return RpcProtocol.REQ_DUMP_NAMENODE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			buffer.putInt(op);
 			return CSIZE;
@@ -563,8 +619,13 @@ public class RpcRequestMessage {
 	
 		public short getType(){
 			return RpcProtocol.REQ_PING_NAMENODE;
-		}		
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			buffer.putInt(op);
 			return CSIZE;
@@ -596,6 +657,11 @@ public class RpcRequestMessage {
 
 		public short getType() {
 			return RpcProtocol.REQ_REMOVE_DATANODE;
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
 		}
 
 		public int write(ByteBuffer buffer) throws IOException {
@@ -630,6 +696,63 @@ public class RpcRequestMessage {
 			return this.port;
 		}
 	}
-	
 
+    public static class HeartbeatReq implements RpcProtocol.NameNodeRpcMessage {
+		protected DataNodeInfo dnInfo;
+		public static int CSIZE = DataNodeInfo.CSIZE+HeartbeatResult.CSIZE;
+        HeartbeatResult heart;
+		public HeartbeatReq() {
+			this.dnInfo = new DataNodeInfo();
+			this.heart=new HeartbeatResult();
+				}
+		public HeartbeatReq(DataNodeInfo dnInfo, HeartbeatResult heart) {
+			this.dnInfo=dnInfo;
+			this.heart = heart;
+			//System.out.println(" init a heart "+heart);
+		}
+		@Override
+		public short getType() {
+			return RpcProtocol.CMD_HEARTBEAT;
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
+
+		public int size() {
+			return DataNodeInfo.CSIZE+HeartbeatResult.CSIZE;
+		}
+
+		public int write(ByteBuffer buffer) throws IOException {
+			int size = size();
+
+			dnInfo.write(buffer);
+			heart.write(buffer);
+			//System.out.println(" heartbeat write succeed");
+			return size;
+		}
+		private void checkSize(int remaining) throws IOException {
+			//System.out.println(" remaining bytes in buffer"+remaining);
+			if (this.size() > remaining)
+				throw new IOException("Only " + remaining + " remaining bytes stored in buffer, however " + this.size() + " bytes are required");
+		}
+
+		public void update(ByteBuffer buffer) throws IOException {
+			checkSize(buffer.remaining());
+			dnInfo.update(buffer);
+			heart.update(buffer);
+
+
+		}
+		public DataNodeInfo getInfo(){
+			return this.dnInfo;
+		}
+		public HeartbeatResult getHeart(){
+			return heart;
+		}
+	}
 }
+
+

@@ -69,6 +69,9 @@ public interface RpcNameNodeService {
 	public abstract short removeDataNode(RpcRequestMessage.RemoveDataNodeReq request,
 			 RpcResponseMessage.RemoveDataNodeRes response, RpcNameNodeState errorState) throws Exception;
 
+	public abstract short heartbeat(RpcRequestMessage.HeartbeatReq request,
+			 RpcResponseMessage.HeartbeatRes response, RpcNameNodeState errorState) throws Exception;
+
 	@SuppressWarnings("unchecked")
 	public static RpcNameNodeService createInstance(String name) throws Exception {
 		Class<?> serviceClass = Class.forName(name);

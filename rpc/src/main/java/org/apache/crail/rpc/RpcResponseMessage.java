@@ -25,15 +25,6 @@ import java.nio.ByteBuffer;
 import org.apache.crail.metadata.BlockInfo;
 import org.apache.crail.metadata.DataNodeStatistics;
 import org.apache.crail.metadata.FileInfo;
-import org.apache.crail.rpc.RpcCreateFile;
-import org.apache.crail.rpc.RpcDeleteFile;
-import org.apache.crail.rpc.RpcGetBlock;
-import org.apache.crail.rpc.RpcGetDataNode;
-import org.apache.crail.rpc.RpcGetFile;
-import org.apache.crail.rpc.RpcGetLocation;
-import org.apache.crail.rpc.RpcPing;
-import org.apache.crail.rpc.RpcRenameFile;
-import org.apache.crail.rpc.RpcVoid;
 
 public class RpcResponseMessage {
 	public static class VoidRes implements RpcProtocol.NameNodeRpcMessage, RpcVoid {
@@ -50,7 +41,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_VOID;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public void update(ByteBuffer buffer) {
 		}
 
@@ -96,7 +92,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_CREATE_FILE;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = fileInfo.write(buffer, shipToken);
 			written += parentInfo.write(buffer, false);
@@ -196,7 +197,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_GET_FILE;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = fileInfo.write(buffer, shipToken);
 			written += fileBlock.write(buffer);
@@ -271,7 +277,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_DELETE_FILE;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = fileInfo.write(buffer, shipToken);
 			written += parentInfo.write(buffer, false);
@@ -349,7 +360,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_RENAME_FILE;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = srcParent.write(buffer, false);
 			written += srcFile.write(buffer, false);
@@ -441,8 +457,6 @@ public class RpcResponseMessage {
 			return dstBlock;
 		}		
 	}	
-	
-
 
 	public static class GetBlockRes implements RpcProtocol.NameNodeRpcMessage, RpcGetBlock {
 		public static int CSIZE = BlockInfo.CSIZE;
@@ -462,7 +476,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_GET_BLOCK;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = blockInfo.write(buffer);
 			return written;
@@ -516,7 +535,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_GET_LOCATION;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = blockInfo.write(buffer);
 			return written;
@@ -567,22 +591,23 @@ public class RpcResponseMessage {
 		}
 		
 		public void setError(short error) {
-			
 		}
-
 		public int size() {
 			return CSIZE;
 		}
-		
 		public short getType(){
 			return RpcProtocol.RES_GET_DATANODE;
-		}	
-		
+		}
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			int written = statistics.write(buffer);
 			return written;
-		}		
-
+		}
 		public void update(ByteBuffer buffer) {
 			try {
 				statistics.update(buffer);
@@ -630,7 +655,12 @@ public class RpcResponseMessage {
 		public short getType(){
 			return RpcProtocol.RES_PING_NAMENODE;
 		}
-		
+
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			buffer.putInt(data);
 			return CSIZE;
@@ -676,6 +706,11 @@ public class RpcResponseMessage {
 			return RpcProtocol.RES_REMOVE_DATANODE;
 		}
 
+		@Override
+		public int gettp() {
+			return 0;
+		}
+
 		public int write(ByteBuffer buffer) {
 			buffer.putShort(rpcStatus);
 			return CSIZE;
@@ -700,5 +735,39 @@ public class RpcResponseMessage {
 		public void setError(short error) {
 			this.error = error;
 		}
+	}
+
+    public static class HeartbeatRes implements RpcProtocol.NameNodeRpcMessage ,RPCHeartbeat{
+		public static int CSIZE = Short.BYTES;
+		private int tp;
+
+		private short error;
+
+		public HeartbeatRes() {
+			this.tp=0;
+			this.error = 0;
+		}
+
+		public int size() {
+			return CSIZE;
+		}
+
+		public short getType() {
+			return RpcProtocol.RES_REMOVE_DATANODE;
+		}
+
+		public int write(ByteBuffer buffer) throws IOException { return CSIZE; }
+		public void update(ByteBuffer buffer) throws IOException {  }
+		public short getError() {
+			return error;
+		}
+
+		public void setError(short error) {
+			this.error = error;
+		}
+
+		@Override
+		public int gettp() { return tp; }
+
 	}
 }
