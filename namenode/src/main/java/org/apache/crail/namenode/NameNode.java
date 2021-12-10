@@ -40,6 +40,7 @@ public class NameNode {
 	private static final Logger LOG = CrailUtils.getLogger();
 	
 	public static void main(String args[]) throws Exception {
+		//conf
 		LOG.info("initalizing namenode ");		
 		CrailConfiguration conf = CrailConfiguration.createConfigurationFromFile();
 		CrailConstants.updateConstants(conf);
@@ -74,6 +75,7 @@ public class NameNode {
 		String namenode = "crail://" + address + ":" + port;
 		long serviceId = CrailUtils.getServiceId(namenode);
 		long serviceSize = CrailUtils.getServiceSize();
+
 		if (!CrailUtils.verifyNamenode(namenode)){
 			throw new Exception("Namenode address/port [" + namenode + "] has to be listed in crail.namenode.address " + CrailConstants.NAMENODE_ADDRESS);
 		}
@@ -81,12 +83,15 @@ public class NameNode {
 		CrailConstants.NAMENODE_ADDRESS = namenode + "?id=" + serviceId + "&size=" + serviceSize;
 		CrailConstants.printConf();
 		CrailConstants.verify();
-		
+		//创建tcp或者darpc的rpcserver
 		RpcNameNodeService service = RpcNameNodeService.createInstance(CrailConstants.NAMENODE_RPC_SERVICE);
 		if (!CrailConstants.NAMENODE_LOG.isEmpty()){
 			LogDispatcher logDispatcher = new LogDispatcher(service);
 			service = logDispatcher;
 		}
+
+		//rpc
+
 		RpcBinding rpcBinding = RpcBinding.createInstance(CrailConstants.NAMENODE_RPC_TYPE);
 		RpcServer rpcServer = rpcBinding.launchServer(service);
 		rpcServer.init(conf, null);

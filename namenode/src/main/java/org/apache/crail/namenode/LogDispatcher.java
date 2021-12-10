@@ -18,9 +18,7 @@
 
 package org.apache.crail.namenode;
 
-import org.apache.crail.rpc.RpcNameNodeService;
-import org.apache.crail.rpc.RpcNameNodeState;
-import org.apache.crail.rpc.RpcProtocol;
+import org.apache.crail.rpc.*;
 import org.apache.crail.rpc.RpcRequestMessage.CreateFileReq;
 import org.apache.crail.rpc.RpcRequestMessage.DumpNameNodeReq;
 import org.apache.crail.rpc.RpcRequestMessage.GetBlockReq;
@@ -142,6 +140,11 @@ public class LogDispatcher implements RpcNameNodeService {
 	public short removeDataNode(RemoveDataNodeReq request, RemoveDataNodeRes response,
 			RpcNameNodeState errorState) throws Exception {
 		return service.removeDataNode(request, response, errorState);
+	}
+
+	@Override
+	public short heartbeat(RpcRequestMessage.HeartbeatReq request, RpcResponseMessage.HeartbeatRes response, RpcNameNodeState errorState) throws Exception {
+		return service.heartbeat(request, response, errorState);
 	}
 
 }

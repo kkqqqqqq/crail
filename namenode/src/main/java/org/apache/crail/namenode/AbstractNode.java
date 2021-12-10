@@ -30,7 +30,7 @@ public abstract class AbstractNode extends FileInfo implements Delayed {
 	private long delay;
 	private int storageClass;
 	private int locationClass;
-	
+
 	//children manipulation
 	//adds or replaces a child, returns previous value or null if there was no mapping
 	public abstract AbstractNode putChild(AbstractNode child) throws Exception;

@@ -38,6 +38,7 @@ import org.apache.crail.utils.CrailUtils;
 import org.slf4j.Logger;
 
 public class NameNodeService implements RpcNameNodeService, Sequencer {
+
 	private static final Logger LOG = CrailUtils.getLogger();
 	
 	//data structures for datanodes, blocks, files
@@ -49,7 +50,8 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 	private FileStore fileTree;
 	private ConcurrentHashMap<Long, AbstractNode> fileTable;	
 	private GCServer gcServer;
-	
+	//public ConcurrentHashMap<Long, Integer> TpList= new ConcurrentHashMap();
+
 	public NameNodeService() throws IOException {
 		URI uri = URI.create(CrailConstants.NAMENODE_ADDRESS);
 		String query = uri.getRawQuery();
@@ -71,6 +73,7 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 	
 	public long getNextId(){
 		return sequenceId.getAndAdd(serviceSize);
+
 	}
 
 	@Override
@@ -79,7 +82,6 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 		if (!RpcProtocol.verifyProtocol(RpcProtocol.CMD_CREATE_FILE, request, response)) {
 			return RpcErrors.ERR_PROTOCOL_MISMATCH;
 		}
-
 		//get params
 		FileName fileHash = request.getFileName();
 		CrailNodeType type = request.getFileType();
@@ -87,13 +89,13 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 		int storageClass = request.getStorageClass();
 		int locationClass = request.getLocationClass();
 		boolean enumerable = request.isEnumerable();
-		
 		//check params
 		if (type.isContainer() && locationClass > 0){
 			return RpcErrors.ERR_DIR_LOCATION_AFFINITY_MISMATCH;
 		}
-		
+
 		//rpc
+
 		AbstractNode parentInfo = fileTree.retrieveParent(fileHash, errorState);
 		if (errorState.getError() != RpcErrors.ERR_OK){
 			return errorState.getError();
@@ -104,17 +106,18 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 		if (!parentInfo.getType().isContainer()){
 			return RpcErrors.ERR_PARENT_NOT_DIR;
 		}
-		
+
 		if (storageClass < 0){
 			storageClass = parentInfo.getStorageClass();
 		}
 		if (locationClass < 0){
 			locationClass = parentInfo.getLocationClass();
 		}
-		
+
 		AbstractNode fileInfo = fileTree.createNode(fileHash.getFileComponent(), type, storageClass, locationClass, enumerable);
 		try {
 			AbstractNode oldNode = parentInfo.putChild(fileInfo);
+
 			if (oldNode != null && oldNode.getFd() != fileInfo.getFd()){
 				appendToDeleteQueue(oldNode);				
 			}		
@@ -122,7 +125,7 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 			return RpcErrors.ERR_FILE_EXISTS;
 		}
 		fileTable.put(fileInfo.getFd(), fileInfo);
-		
+
 		NameNodeBlockInfo fileBlock = blockStore.getBlock(fileInfo.getStorageClass(), fileInfo.getLocationClass());
 		if (fileBlock == null){
 			return RpcErrors.ERR_NO_FREE_BLOCKS;
@@ -162,7 +165,7 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 		response.setFileInfo(fileInfo);
 		response.setFileBlock(fileBlock);
 		response.setDirBlock(parentBlock);
-		
+		LOG.info("createFile: fd " + fileInfo.getFd() + ", parent " + parentInfo.getFd() + ", writeable " + writeable + ", token " + fileInfo.getToken() + ", capacity " + fileInfo.getCapacity() + ", dirOffset " + fileInfo.getDirOffset());
 		if (CrailConstants.DEBUG){
 			LOG.info("createFile: fd " + fileInfo.getFd() + ", parent " + parentInfo.getFd() + ", writeable " + writeable + ", token " + fileInfo.getToken() + ", capacity " + fileInfo.getCapacity() + ", dirOffset " + fileInfo.getDirOffset());
 		}	
@@ -610,7 +613,20 @@ public class NameNodeService implements RpcNameNodeService, Sequencer {
 		return RpcErrors.ERR_OK;
 	}
 
-	
+	@Override
+	public short heartbeat(RpcRequestMessage.HeartbeatReq request, RpcResponseMessage.HeartbeatRes response, RpcNameNodeState errorState) throws Exception {
+		HeartbeatResult heart= request.getHeart();
+		DataNodeInfo dnInfo=request.getInfo();
+		//System.out.println("recieved a heartbeat  ="+heart);
+		if(!blockStore.HeartList.containsKey(dnInfo.key())){
+			blockStore.HeartList.put(dnInfo.key(),heart);
+		}else{
+			blockStore.HeartList.replace(dnInfo.key(),heart);
+		}
+		return RpcErrors.ERR_OK;
+	}
+
+
 	//--------------- helper functions
 
 	public short prepareDataNodeForRemoval(DataNodeInfo dn) throws Exception {

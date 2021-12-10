@@ -36,6 +36,7 @@ public class DataNodeBlocks extends DataNodeInfo {
 	private ConcurrentHashMap<Long, BlockInfo> regions;
 	private LinkedBlockingQueue<NameNodeBlockInfo> freeBlocks;
 	private long token;
+
 	private long maxBlockCount;
 	private boolean scheduleForRemoval;
 
@@ -68,6 +69,8 @@ public class DataNodeBlocks extends DataNodeInfo {
 		freeBlocks.add(nnBlock);
 		updateBlockCount();
 	}
+
+
 
 	public NameNodeBlockInfo getFreeBlock() throws InterruptedException {
 		NameNodeBlockInfo block = this.freeBlocks.poll();
@@ -117,5 +120,11 @@ public class DataNodeBlocks extends DataNodeInfo {
 	
 	public boolean isOnline(){
 		return System.nanoTime() <= token;
-	}	
+	}
+
+
+
+
+	//public float get_tp(){;}
+
 }
