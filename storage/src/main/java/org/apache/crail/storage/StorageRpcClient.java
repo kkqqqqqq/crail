@@ -66,5 +66,11 @@ public class StorageRpcClient {
 		InetSocketAddress inetAddress = serverAddress;
 		DataNodeInfo dnInfo = new DataNodeInfo(storageType, storageClass.value(), locationClass.value(), inetAddress.getAddress().getAddress(), inetAddress.getPort());
 		return this.rpcConnection.getDataNode(dnInfo).get(CrailConstants.RPC_TIMEOUT, TimeUnit.MILLISECONDS).getStatistics();
-	}	
+	}
+
+	public DataNodeInfo getdnInfo() {
+		InetSocketAddress inetAddress = serverAddress;
+		DataNodeInfo dnInfo = new DataNodeInfo(storageType, storageClass.value(), locationClass.value(), inetAddress.getAddress().getAddress(), inetAddress.getPort());
+		return dnInfo;
+	}
 }
